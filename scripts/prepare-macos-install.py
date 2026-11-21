@@ -23,6 +23,16 @@ def main():
     args = parser.parse_args()
     subprocess.run([sys.executable, str(Path(__file__).resolve().parents[1] /
                                       'scripts/extract-files.py')], check=True)
+    wifi = DEVICE / 'drivers/Ath12kWifi'
+    freebsd = json.loads((wifi / 'tools/source-lock.json').read_text())['freebsd']
+    freebsd_checkout = wifi / 'deps/freebsd'
+    if not freebsd_checkout.exists():
+        subprocess.run(['git', 'clone', '--depth', '1', '--no-checkout', '--filter=blob:none',
+                        freebsd['url'], str(freebsd_checkout)], check=True)
+    subprocess.run(['git', '-C', str(freebsd_checkout), 'fetch', '--depth', '1', 'origin',
+                    freebsd['commit']], check=True)
+    subprocess.run(['git', '-C', str(freebsd_checkout), 'checkout', '--detach',
+                    freebsd['commit']], check=True)
     subprocess.run([sys.executable, str(Path(__file__).resolve().parents[1] /
                                       'drivers/Ath12kWifi/tools/fetch-sources.py')], check=True)
     ctx = Context(cli_parser().parse_args(['build', 'kernel', '-D', str(Path(__file__).resolve().parents[1]),
