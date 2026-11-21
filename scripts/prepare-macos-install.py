@@ -31,6 +31,7 @@ def main():
                         freebsd['url'], str(freebsd_checkout)], check=True)
     subprocess.run(['git', '-C', str(freebsd_checkout), 'fetch', '--depth', '1', 'origin',
                     freebsd['commit']], check=True)
+    subprocess.run(['git', '-C', str(freebsd_checkout), 'sparse-checkout', 'init', '--cone'], check=True)
     subprocess.run(['git', '-C', str(freebsd_checkout), 'checkout', '--detach',
                     freebsd['commit']], check=True)
     subprocess.run([sys.executable, str(Path(__file__).resolve().parents[1] /
